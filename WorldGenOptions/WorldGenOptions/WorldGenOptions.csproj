@@ -64,6 +64,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Generator.cs" />
     <Compile Include="SaveData.cs" />
     <Compile Include="WorldGenData.cs" />
     <Compile Include="GenOptions.cs" />

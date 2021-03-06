@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using BepInEx;
 using BepInEx.Configuration;
 using HarmonyLib;
@@ -12,7 +11,7 @@ namespace WorldGenOptions
     public class GenOptions : BaseUnityPlugin
     {
         private const string GUID = "org.github.spacedrive.worldgen";
-        private const string VERSION = "0.1.0.0";
+        private const string VERSION = "0.1.2.0";
 
         // default, unmodded gen data
         public static WorldGenData defaultData = new WorldGenData();
@@ -110,8 +109,7 @@ namespace WorldGenOptions
                 "Farthest distance from the center of the map that mistlands can generate.");
 
             minMountainHeight = configFile.Bind("Biomes.Mountain", "MinMountainHeight", 0.4f,
-                "Minimum height for mountains to spawn. Setting to below 0.2 may cause " +
-                "game to hang while creating a new world.");
+                "Minimum height for mountains to spawn.");
 
             plainsBiomeScaleX = configFile.Bind("Biomes.Plains", "PlainsBiomeScaleX", 0.001f,
                 "X scale of the plains biome; can make the biome look more \"scattered\".");
@@ -142,7 +140,7 @@ namespace WorldGenOptions
             minSwampDist = configFile.Bind("Biomes.Swamp", "MinSwampDist", 2000f,
                 "Closest distance to the center of the map that swamps can generate.");
 
-            maxSwampDist = configFile.Bind("Biomes.Swamp", "MaxSwampDist", 8000f, 
+            maxSwampDist = configFile.Bind("Biomes.Swamp", "MaxSwampDist", 8000f,
                 "Farthest distance from the center of the map that swamps can generate.");
 
             minSwampHeight = configFile.Bind("Biomes.Swamp", "MinSwampHeight", 0.05f,
@@ -152,8 +150,7 @@ namespace WorldGenOptions
                 "Highest height swamps can generate at.");
 
             meadowsSwitch = configFile.Bind("Switchers", "MeadowsSwitch", "meadows",
-                "Replaces all meadows biomes with given biome. May cause game to be unable " +
-                "to generate a new world.");
+                "Replaces all meadows biomes with given biome.");
 
             blackForestSwitch = configFile.Bind("Switchers", "BlackForestSwitch", "blackforest",
                 "Replaces all black forest biomes with given biome.");
@@ -221,7 +218,7 @@ namespace WorldGenOptions
 
         Heightmap.Biome AssignSwitch(string biome)
         {
-            switch(biome.ToLower())
+            switch (biome.ToLower())
             {
                 case "ashlands":
                 case "ash lands":
@@ -263,87 +260,6 @@ namespace WorldGenOptions
             AssignConfigData(ref savedData);
 
             harmony.PatchAll();
-        }
-    }
-
-    [HarmonyPatch(typeof(WorldGenerator))]
-    [HarmonyPatch(nameof(WorldGenerator.GetBiome))]
-    [HarmonyPatch(new Type[] {typeof(float), typeof(float)})]
-    public static class BiomeGenPrefixPatch
-    {
-        public static bool Prefix(ref WorldGenerator __instance, ref Heightmap.Biome __result, float wx, float wy)
-        {
-            if (__instance.m_world.m_menu)
-            {
-                if (__instance.GetBaseHeight(wx, wy, true) >= 0.4f)
-                {
-                    __result = Heightmap.Biome.Mountain;
-                    return false;
-                }
-                __result = Heightmap.Biome.BlackForest;
-                return false;
-            }
-            else
-            {
-                float magnitude = new UnityEngine.Vector2(wx, wy).magnitude;
-                float baseHeight = __instance.GetBaseHeight(wx, wy, false);
-                float num = __instance.WorldAngle(wx, wy) * 100f;
-                if (new UnityEngine.Vector2(wx, wy + GenOptions.usingData.minAshlandsDist).magnitude > 12000f + num)
-                {
-                    __result = GenOptions.usingData.ashlandsSwitch;
-                    return false;
-                }
-                if ((double)baseHeight <= 0.02)
-                {
-                    __result = Heightmap.Biome.Ocean;
-                    return false;
-                }
-                if (new UnityEngine.Vector2(wx, wy + GenOptions.usingData.minDeepNorthDist).magnitude > 12000f + num)
-                {
-                    if (baseHeight > GenOptions.usingData.minMountainHeight)
-                    {
-                        __result = GenOptions.usingData.ashlandsSwitch;
-                        return false;
-                    }
-                    __result = GenOptions.usingData.deepNorthSwitch;
-                    return false;
-                }
-                else
-                {
-                    if (baseHeight > GenOptions.usingData.minMountainHeight)
-                    {
-                        __result = GenOptions.usingData.mountainSwitch;
-                        return false;
-                    }
-                    if (UnityEngine.Mathf.PerlinNoise((__instance.m_offset0 + wx) * GenOptions.usingData.swampBiomeScaleX, (__instance.m_offset0 + wy) * GenOptions.usingData.swampBiomeScaleY) > GenOptions.usingData.minSwampNoise && magnitude > GenOptions.usingData.minSwampDist && magnitude < GenOptions.usingData.maxSwampDist && baseHeight > GenOptions.usingData.minSwampHeight && baseHeight < GenOptions.usingData.maxSwampHeight)
-                    {
-                        __result = GenOptions.usingData.swampSwitch;
-                        return false;
-                    }
-                    if (UnityEngine.Mathf.PerlinNoise((__instance.m_offset4 + wx) * GenOptions.usingData.mistlandsBiomeScaleX, (__instance.m_offset4 + wy) * GenOptions.usingData.mistlandsBiomeScaleY) > GenOptions.usingData.minMistlandsNoise && magnitude > GenOptions.usingData.minMistlandsDist + num && magnitude < GenOptions.usingData.maxMistlandsDist)
-                    {
-                        __result = GenOptions.usingData.mistlandsSwitch;
-                        return false;
-                    }
-                    if (UnityEngine.Mathf.PerlinNoise((__instance.m_offset1 + wx) * GenOptions.usingData.plainsBiomeScaleX, (__instance.m_offset1 + wy) * GenOptions.usingData.plainsBiomeScaleY) > GenOptions.usingData.minPlainsNoise && magnitude > GenOptions.usingData.minPlainsDist + num && magnitude < GenOptions.usingData.maxPlainsDist)
-                    {
-                        __result = GenOptions.usingData.plainsSwitch;
-                        return false;
-                    }
-                    if (UnityEngine.Mathf.PerlinNoise((__instance.m_offset2 + wx) * GenOptions.usingData.plainsBiomeScaleX, (__instance.m_offset2 + wy) * GenOptions.usingData.plainsBiomeScaleY) > GenOptions.usingData.minPlainsNoise && magnitude > GenOptions.usingData.minBlackForestDist + num && magnitude < GenOptions.usingData.maxBlackForestDist)
-                    {
-                        __result = GenOptions.usingData.blackForestSwitch;
-                        return false;
-                    }
-                    if (magnitude > 5000f + num)
-                    {
-                        __result = GenOptions.usingData.blackForestSwitch;
-                        return false;
-                    }
-                    __result = GenOptions.usingData.meadowsSwitch;
-                    return false;
-                }
-            }
         }
     }
 }

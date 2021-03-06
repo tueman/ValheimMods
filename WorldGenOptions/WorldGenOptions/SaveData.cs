@@ -132,7 +132,7 @@ namespace SaveData
         }
     }
 
-            [HarmonyPatch(typeof(World))]
+    [HarmonyPatch(typeof(World))]
     [HarmonyPatch(nameof(World.GetWorldList))]
     public static class GetWorldList_BiomePatch
     {
