@@ -11,7 +11,7 @@ using HarmonyLib;
 
 namespace Generator
 {
-    
+
     [HarmonyPatch(typeof(WorldGenerator))]
     [HarmonyPatch(nameof(WorldGenerator.GetBiome))]
     [HarmonyPatch(new Type[] { typeof(float), typeof(float) })]
@@ -92,7 +92,7 @@ namespace Generator
             }
         }
     }
-    
+
     //temp fix for StartTemple not spawning
     [HarmonyPatch(typeof(ZoneSystem))]
     [HarmonyPatch(nameof(ZoneSystem.GenerateLocations))]
@@ -101,10 +101,56 @@ namespace Generator
     {
         public static void Prefix(ref ZoneSystem.ZoneLocation location)
         {
-            if(location.m_prefabName == "StartTemple")
+            if (location.m_prefabName == "StartTemple")
             {
                 location.m_biome = WorldGenOptions.GenOptions.usingData.meadowsSwitch;
             }
+        }
+    }
+
+    [HarmonyPatch(typeof(WorldGenerator))]
+    [HarmonyPatch(nameof(WorldGenerator.PlaceRivers))]
+    public static class PlaceRiverPrefix
+    {
+        public static bool Prefix(ref WorldGenerator __instance, ref List<WorldGenerator.River> __result)
+        {
+            UnityEngine.Random.State state = UnityEngine.Random.state;
+            UnityEngine.Random.InitState(__instance.m_riverSeed);
+            DateTime now = DateTime.Now;
+            List<WorldGenerator.River> list = new List<WorldGenerator.River>();
+            List<UnityEngine.Vector2> list2 = new List<UnityEngine.Vector2>(__instance.m_lakes);
+            while (list2.Count > 1)
+            {
+                UnityEngine.Vector2 vector = list2[0];
+                int num = __instance.FindRandomRiverEnd(list, __instance.m_lakes, vector, WorldGenOptions.GenOptions.usingData.riverMaxDistance, 0.4f, 128f);
+                if (num == -1 && !__instance.HaveRiver(list, vector))
+                {
+                    num = __instance.FindRandomRiverEnd(list, __instance.m_lakes, vector, 5000f, 0.4f, 128f);
+                }
+                if (num != -1)
+                {
+                    WorldGenerator.River river = new WorldGenerator.River();
+                    river.p0 = vector;
+                    river.p1 = __instance.m_lakes[num];
+                    river.center = (river.p0 + river.p1) * 0.5f;
+                    river.widthMax = UnityEngine.Random.Range(WorldGenOptions.GenOptions.usingData.riverWidthMaxLowerRange, WorldGenOptions.GenOptions.usingData.riverWidthMaxUpperRange);
+                    river.widthMin = UnityEngine.Random.Range(WorldGenOptions.GenOptions.usingData.riverWidthMinLowerRange, river.widthMax);
+                    float num2 = UnityEngine.Vector2.Distance(river.p0, river.p1);
+                    river.curveWidth = num2 / WorldGenOptions.GenOptions.usingData.riverCurveWidth;
+                    river.curveWavelength = num2 / WorldGenOptions.GenOptions.usingData.riverWavelength;
+                    list.Add(river);
+                }
+                else
+                {
+                    list2.RemoveAt(0);
+                }
+            }
+            ZLog.Log("Rivers:" + list.Count);
+            __instance.RenderRivers(list);
+            ZLog.Log("River Calc time " + (DateTime.Now - now).TotalMilliseconds + " ms");
+            UnityEngine.Random.state = state;
+            __result = list;
+            return false;
         }
     }
 }
