@@ -37,10 +37,7 @@
       <HintPath>..\..\Libs\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="assembly_utils">
-      <HintPath>..\Libs\assembly_utils.dll</HintPath>
-    </Reference>
-    <Reference Include="assembly_utils_publicized">
-      <HintPath>..\..\Libs\assembly_utils_publicized.dll</HintPath>
+      <HintPath>..\..\Libs\assembly_utils.dll</HintPath>
     </Reference>
     <Reference Include="assembly_valheim_publicized">
       <HintPath>..\..\Libs\assembly_valheim_publicized.dll</HintPath>
@@ -64,9 +61,6 @@
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\Libs\UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>..\..\Libs\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
