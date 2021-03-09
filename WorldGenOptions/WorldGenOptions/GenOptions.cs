@@ -66,6 +66,13 @@ namespace WorldGenOptions
         ConfigEntry<string> ashlandsSwitch;
         ConfigEntry<string> deepNorthSwitch;
 
+        ConfigEntry<float> riverMaxDistance;
+        ConfigEntry<float> riverWidthMaxUpperRange;
+        ConfigEntry<float> riverWidthMaxLowerRange;
+        ConfigEntry<float> riverWidthMinLowerRange;
+        ConfigEntry<float> riverCurveWidth;
+        ConfigEntry<float> riverWaveLength;
+
         void InitializeConfig()
         {
             minAshlandsDist = configFile.Bind("Biomes.Ashlands", "AshlandsDistFromEdge", -4000f,
@@ -172,6 +179,25 @@ namespace WorldGenOptions
 
             deepNorthSwitch = configFile.Bind("Switchers", "DeepNorthSwitch", "deepnorth",
                 "Replaces all deep north biomes with given biome.");
+
+
+            riverMaxDistance = configFile.Bind("River", "RiverMaxDistance", 2000f,
+                "Maximum lenght of a river, higher number will have more rivers and longer rivers");
+
+            riverWidthMaxUpperRange = configFile.Bind("River", "RiverWidthMaxUpperRange", 100f,
+                "Upper range of the max width of a river");
+
+            riverWidthMaxLowerRange = configFile.Bind("River", "RiverWidthMaxLowerRange", 60f,
+                "Lower range of the max width of a river");
+
+            riverWidthMinLowerRange = configFile.Bind("River", "RiverWidthMinLowerRange", 60f,
+                "Lower range of the minimum width of a river");
+
+            riverCurveWidth = configFile.Bind("River", "RiverCurveWidth", 15f, 
+                "Size of river curve width"); //Haven't tested these yet to see how it effects river generation
+
+            riverWaveLength = configFile.Bind("River", "RiverWaveLength", 20f,
+                "Size of river wave length"); //Haven't tested these yet to see how it effects river generation
         }
 
         void AssignConfigData(ref WorldGenData data)
@@ -214,6 +240,14 @@ namespace WorldGenOptions
             data.mistlandsSwitch = AssignSwitch(mistlandsSwitch.Value);
             data.ashlandsSwitch = AssignSwitch(ashlandsSwitch.Value);
             data.deepNorthSwitch = AssignSwitch(deepNorthSwitch.Value);
+
+
+            data.riverMaxDistance = riverMaxDistance.Value;
+            data.riverWidthMaxUpperRange = riverWidthMaxUpperRange.Value;
+            data.riverWidthMaxLowerRange = riverWidthMaxLowerRange.Value;
+            data.riverWidthMinLowerRange = riverWidthMinLowerRange.Value;
+            data.riverCurveWidth = riverCurveWidth.Value;
+            data.riverWavelength = riverWaveLength.Value;
         }
 
         Heightmap.Biome AssignSwitch(string biome)
