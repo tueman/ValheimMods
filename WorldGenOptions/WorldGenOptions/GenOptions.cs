@@ -11,7 +11,7 @@ namespace WorldGenOptions
     public class GenOptions : BaseUnityPlugin
     {
         private const string GUID = "org.github.spacedrive.worldgen";
-        private const string VERSION = "0.1.2.0";
+        private const string VERSION = "0.1.3.0";
 
         // default, unmodded gen data
         public static WorldGenData defaultData = new WorldGenData();
@@ -19,7 +19,7 @@ namespace WorldGenOptions
         // data stored in config file
         public static WorldGenData savedData = new WorldGenData();
 
-        // data loaded from biome data
+        // data currently being used on active world
         public static WorldGenData usingData = new WorldGenData();
 
         public static bool hasBiomeData = false;
@@ -206,8 +206,8 @@ namespace WorldGenOptions
             riverCurveWidth = configFile.Bind("Rivers", "RiverCurveWidth", 15f, 
                 "Size of river curve width.");
 
-            riverWaveLength = configFile.Bind("Rivers", "RiverWaveLength", 20f,
-                "Size of river wave length.");
+            riverWaveLength = configFile.Bind("Rivers", "RiverCurveWaveLength", 20f,
+                "Size of river curve wave length.");
         }
 
         void AssignConfigData(ref WorldGenData data)
