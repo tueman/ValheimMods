@@ -93,21 +93,13 @@ namespace Generator
         }
     }
     
-    //temp fix for StartTemple not spawning
+    //fix for StartTemple not spawning
     [HarmonyPatch(typeof(ZoneSystem))]
     [HarmonyPatch(nameof(ZoneSystem.GenerateLocations))]
     [HarmonyPatch(new Type[] { typeof(ZoneSystem.ZoneLocation) })]
     [HarmonyDebug]
     public static class StartTemple_SpawnFix
-    {/*
-        public static void Prefix(ref ZoneSystem.ZoneLocation location)
-        {
-            if(location.m_prefabName == "StartTemple")
-            {
-                location.m_biome = WorldGenOptions.GenOptions.usingData.meadowsSwitch;
-            }
-        }*/
-
+    {
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator il)
         {
             List<CodeInstruction> codes = new List<CodeInstruction>(instructions);
@@ -143,11 +135,6 @@ namespace Generator
             };
         
             codes.InsertRange(check, addCodes);
-
-            for(int i = 0; i < codes.Count; ++i)
-            {
-                UnityEngine.Debug.Log(codes[i]);
-            }
 
             return codes.AsEnumerable();
         }
