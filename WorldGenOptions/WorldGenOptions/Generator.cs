@@ -154,7 +154,7 @@ namespace Generator
             while (list2.Count > 1)
             {
                 UnityEngine.Vector2 vector = list2[0];
-                int num = __instance.FindRandomRiverEnd(list, __instance.m_lakes, vector, WorldGenOptions.GenOptions.usingData.riverMaxDistance, 0.4f, 128f);
+                int num = __instance.FindRandomRiverEnd(list, __instance.m_lakes, vector, WorldGenOptions.GenOptions.usingData.riverMultipleMaxDistance, 0.4f, 128f);
                 if (num == -1 && !__instance.HaveRiver(list, vector))
                 {
                     num = __instance.FindRandomRiverEnd(list, __instance.m_lakes, vector, 5000f, 0.4f, 128f);

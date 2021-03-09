@@ -54,12 +54,14 @@
     public Heightmap.Biome deepNorthSwitch = Heightmap.Biome.DeepNorth;
 
     // river
-    public float riverMaxDistance = 2000f; // 2000
+    public float riverMultipleMaxDistance = 2000f; // 2000
+    public float riverExtremeMaxDistance = 5000f; // 5000
+    public float riverMaxHeight = 0.4f; // 0.4
     public float riverWidthMaxLowerRange = 60f; // 60
     public float riverWidthMaxUpperRange = 100f; // 100
     public float riverWidthMinLowerRange = 60f; // 60 No upper range as river.widthMax is it
-    public float riverCurveWidth = 15f; // 15    ** num2/15f **
-    public float riverWavelength = 20f;// 20     ** num2/20f **
+    public float riverCurveWidth = 15f; // 15
+    public float riverWavelength = 20f; // 20
 
     public void WriteBiomeData(ref ZPackage package)
     {
@@ -111,9 +113,11 @@
         package.Write((int)deepNorthSwitch);
 
         // river
-        package.Write(riverMaxDistance);
+        package.Write(riverMultipleMaxDistance);
+        package.Write(riverExtremeMaxDistance);
+        package.Write(riverMaxHeight);
         package.Write(riverWidthMaxLowerRange);
-        package.Write(riverWidthMinLowerRange);
+        package.Write(riverWidthMaxUpperRange);
         package.Write(riverWidthMinLowerRange);
         package.Write(riverCurveWidth);
         package.Write(riverWavelength);
@@ -169,7 +173,9 @@
         deepNorthSwitch = (Heightmap.Biome)package.ReadInt();
 
         // river
-        riverMaxDistance = package.ReadSingle();
+        riverMultipleMaxDistance = package.ReadSingle();
+        riverExtremeMaxDistance = package.ReadSingle();
+        riverMaxHeight = package.ReadSingle();
         riverWidthMaxLowerRange = package.ReadSingle();
         riverWidthMaxUpperRange = package.ReadSingle();
         riverWidthMinLowerRange = package.ReadSingle();
