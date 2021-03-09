@@ -66,7 +66,9 @@ namespace WorldGenOptions
         ConfigEntry<string> ashlandsSwitch;
         ConfigEntry<string> deepNorthSwitch;
 
-        ConfigEntry<float> riverMaxDistance;
+        ConfigEntry<float> riverMultipleMaxDistance;
+        ConfigEntry<float> riverExtremeMaxDistance;
+        ConfigEntry<float> riverMaxHeight;
         ConfigEntry<float> riverWidthMaxUpperRange;
         ConfigEntry<float> riverWidthMaxLowerRange;
         ConfigEntry<float> riverWidthMinLowerRange;
@@ -181,23 +183,31 @@ namespace WorldGenOptions
                 "Replaces all deep north biomes with given biome.");
 
 
-            riverMaxDistance = configFile.Bind("River", "RiverMaxDistance", 2000f,
-                "Maximum lenght of a river, higher number will have more rivers and longer rivers");
+            riverMultipleMaxDistance = configFile.Bind("Rivers", "RiverNormalMaxDistance", 2000f,
+                "Maximum length of common rivers; lakes can have multiple rivers of this length.");
 
-            riverWidthMaxUpperRange = configFile.Bind("River", "RiverWidthMaxUpperRange", 100f,
-                "Upper range of the max width of a river");
+            riverExtremeMaxDistance = configFile.Bind("Rivers", "RiverAbsoluteMaxDistance", 5000f, 
+                "Absolute maximum distance a river can be; lakes will have no more than one river of this " +
+                "length.");
 
-            riverWidthMaxLowerRange = configFile.Bind("River", "RiverWidthMaxLowerRange", 60f,
-                "Lower range of the max width of a river");
+            riverMaxHeight = configFile.Bind("Rivers", "RiverMaxHeight", 0.4f, 
+                "Maximum height of terrain that rivers can pass through.");
 
-            riverWidthMinLowerRange = configFile.Bind("River", "RiverWidthMinLowerRange", 60f,
-                "Lower range of the minimum width of a river");
+            riverWidthMaxUpperRange = configFile.Bind("Rivers", "RiverWidthMaxUpperRange", 100f,
+                "Upper range of the randomly chosen max width of a river.");
 
-            riverCurveWidth = configFile.Bind("River", "RiverCurveWidth", 15f, 
-                "Size of river curve width"); //Haven't tested these yet to see how it effects river generation
+            riverWidthMaxLowerRange = configFile.Bind("Rivers", "RiverWidthMaxLowerRange", 60f,
+                "Lower range of the randomly chosen max width of a river.");
 
-            riverWaveLength = configFile.Bind("River", "RiverWaveLength", 20f,
-                "Size of river wave length"); //Haven't tested these yet to see how it effects river generation
+            riverWidthMinLowerRange = configFile.Bind("Rivers", "RiverWidthMinLowerRange", 60f,
+                "Lower range of the randomly chosen minimum width of a river, where the max width of the " +
+                "river is the upper range of the minimum width.");
+
+            riverCurveWidth = configFile.Bind("Rivers", "RiverCurveWidth", 15f, 
+                "Size of river curve width.");
+
+            riverWaveLength = configFile.Bind("Rivers", "RiverWaveLength", 20f,
+                "Size of river wave length.");
         }
 
         void AssignConfigData(ref WorldGenData data)
@@ -242,7 +252,9 @@ namespace WorldGenOptions
             data.deepNorthSwitch = AssignSwitch(deepNorthSwitch.Value);
 
 
-            data.riverMaxDistance = riverMaxDistance.Value;
+            data.riverMultipleMaxDistance = riverMultipleMaxDistance.Value;
+            data.riverExtremeMaxDistance = riverExtremeMaxDistance.Value;
+            data.riverMaxHeight = riverMaxHeight.Value;
             data.riverWidthMaxUpperRange = riverWidthMaxUpperRange.Value;
             data.riverWidthMaxLowerRange = riverWidthMaxLowerRange.Value;
             data.riverWidthMinLowerRange = riverWidthMinLowerRange.Value;

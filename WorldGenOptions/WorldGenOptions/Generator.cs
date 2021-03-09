@@ -92,19 +92,51 @@ namespace Generator
             }
         }
     }
-
-    //temp fix for StartTemple not spawning
+    
+    //fix for StartTemple not spawning
     [HarmonyPatch(typeof(ZoneSystem))]
     [HarmonyPatch(nameof(ZoneSystem.GenerateLocations))]
     [HarmonyPatch(new Type[] { typeof(ZoneSystem.ZoneLocation) })]
+    [HarmonyDebug]
     public static class StartTemple_SpawnFix
     {
-        public static void Prefix(ref ZoneSystem.ZoneLocation location)
+        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator il)
         {
-            if (location.m_prefabName == "StartTemple")
+            List<CodeInstruction> codes = new List<CodeInstruction>(instructions);
+            int numAnds = 0;
+            int check = 0;
+            Label correctBiome = il.DefineLabel();
+
+            // find second usage of & operator
+            for(int i = 0; i < codes.Count; ++i)
             {
-                location.m_biome = WorldGenOptions.GenOptions.usingData.meadowsSwitch;
+                if(codes[i].opcode == OpCodes.And)
+                {
+                    ++numAnds;
+                    if(numAnds == 2)
+                    {
+                        // take it back now y'all
+                        check = i - 3;
+                        break;
+                    }
+                }
             }
+
+            codes[check + 10].labels.Add(correctBiome);
+
+            // add check if __instance.prefabName == "StartTemple"; if so, skip biome checking
+            List<CodeInstruction> addCodes = new List<CodeInstruction>()
+            {
+                new CodeInstruction(OpCodes.Ldarg_1),
+                new CodeInstruction(OpCodes.Ldfld, typeof(ZoneSystem.ZoneLocation).GetField(nameof(ZoneSystem.ZoneLocation.m_prefabName))),
+                new CodeInstruction(OpCodes.Ldstr, "StartTemple"),
+                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(String), "op_Equality")),
+                new CodeInstruction(OpCodes.Brtrue, correctBiome)
+            };
+        
+            codes.InsertRange(check, addCodes);
+
+            return codes.AsEnumerable();
         }
     }
 
@@ -122,7 +154,7 @@ namespace Generator
             while (list2.Count > 1)
             {
                 UnityEngine.Vector2 vector = list2[0];
-                int num = __instance.FindRandomRiverEnd(list, __instance.m_lakes, vector, WorldGenOptions.GenOptions.usingData.riverMaxDistance, 0.4f, 128f);
+                int num = __instance.FindRandomRiverEnd(list, __instance.m_lakes, vector, WorldGenOptions.GenOptions.usingData.riverMultipleMaxDistance, 0.4f, 128f);
                 if (num == -1 && !__instance.HaveRiver(list, vector))
                 {
                     num = __instance.FindRandomRiverEnd(list, __instance.m_lakes, vector, 5000f, 0.4f, 128f);
