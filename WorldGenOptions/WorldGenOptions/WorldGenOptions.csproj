@@ -39,7 +39,8 @@
     <Reference Include="assembly_utils">
       <HintPath>..\Libs\assembly_utils.dll</HintPath>
     </Reference>
-    <Reference Include="assembly_valheim_publicized">
+    <Reference Include="assembly_valheim_publicized, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Libs\publicized_assemblies\assembly_valheim_publicized.dll</HintPath>
     </Reference>
     <Reference Include="BepInEx">
@@ -47,6 +48,12 @@
     </Reference>
     <Reference Include="BepInEx.Harmony">
       <HintPath>..\Libs\BepInEx.Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil">
+      <HintPath>..\Libs\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMod.Utils">
+      <HintPath>..\Libs\MonoMod.Utils.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
