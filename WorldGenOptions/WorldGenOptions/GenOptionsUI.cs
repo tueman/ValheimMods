@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace WorldGenOptions
 {
-    public class GenOptionsUI : MonoBehaviour
+    public class GenOptionsUI : BaseUnityPlugin
     {
         public static GenOptionsUI instance;
 

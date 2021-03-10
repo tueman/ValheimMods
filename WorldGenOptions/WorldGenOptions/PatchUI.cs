@@ -7,8 +7,10 @@ namespace WorldGenOptions
     class PatchInitUI
     {
         public static GameObject genUI = new GameObject("GenOptionsUI");
+
         static void Postfix(ref FejdStartup __instance)
         {
+            ZLog.Log(genUI);
             if (!GenOptionsUI.instance)
             {
                 ZLog.Log("ShowStartGame GenOptionsUI.instance == false");
@@ -29,7 +31,7 @@ namespace WorldGenOptions
         {
             if (GenOptionsUI.instance)
             {
-                PatchInitUI.genUI.SetActive(false);
+                PatchInitUI.genUI.SetActive(true);
             }
         }
     }
@@ -58,7 +60,7 @@ namespace WorldGenOptions
                 if (!centerSelection)
                 {
                     ZLog.Log("centerSelection == false || should activate UI");
-                    __instance.m_joinGameButton.interactable = (__instance.m_joinServer != null);
+                    //__instance.m_joinGameButton.interactable = (__instance.m_joinServer != null);
                     PatchInitUI.genUI.SetActive(true);
                     GenOptionsUI.instance.worldName = __instance.m_world.m_name;
                 }
@@ -75,11 +77,12 @@ namespace WorldGenOptions
     [HarmonyPatch(typeof(FejdStartup), "OnWorldStart")]
     class PatchUIClose
     {
-        static void Postfix()
+        static void Postfix(ref FejdStartup __instance)
         {
             if (GenOptionsUI.instance)
             {
                 PatchInitUI.genUI.SetActive(false);
+                GenOptionsUI.Destroy(PatchInitUI.genUI);
             }
         }
     }
@@ -96,7 +99,7 @@ namespace WorldGenOptions
             }
         }
     }
-
+    /*
     //Close UI when clicking on Join Game tab **Only work once for some reason** Might be a good idea to remove this if people want to change worldgen on servers
     [HarmonyPatch(typeof(FejdStartup), "Update")]
     class PatchUIJoinGame
@@ -115,5 +118,6 @@ namespace WorldGenOptions
                 }
             }
         }
-    }
+    } 
+    */
 }
