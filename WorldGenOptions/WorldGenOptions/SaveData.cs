@@ -7,16 +7,24 @@ namespace SaveData
 {
     public static class SavingData
     {
-        public const string saveFileSuffix = "_biomeData";
+        public const string saveFileSuffix = "_genData";
 
-        public static string GetBiomeSavePath(World world)
+        public static string GetGenSavePathRaw()
         {
-            return world.m_worldSavePath + "/" + world.m_name + saveFileSuffix + ".fwl";
+            return World.GetWorldSavePath() + "/GenData/";
         }
         
+        public static string GetGenSavePath(string name)
+        {
+            return GetGenSavePathRaw() + name + saveFileSuffix + ".fwl";
+        }
+
+        // deprecated; only implemented temporarily
+        public const string saveFileSuffixOld = "_biomeData";
+
         public static string GetBiomeSavePath(string name)
         {
-            return World.GetWorldSavePath() + "/" + name + saveFileSuffix + ".fwl";
+            return World.GetWorldSavePath() + "/" + name + saveFileSuffixOld + ".fwl";
         }
     }
 
@@ -35,8 +43,14 @@ namespace SaveData
 
             WorldGenOptions.GenOptions.savedData.WriteBiomeData(ref biomePackage);
 
-            string biomePath = SavingData.GetBiomeSavePath(__instance);
+            string biomePath = SavingData.GetGenSavePath(__instance.m_name);
             byte[] biomeArray = biomePackage.GetArray();
+
+            if(!File.Exists(SavingData.GetGenSavePathRaw()))
+            {
+                Directory.CreateDirectory(SavingData.GetGenSavePathRaw());
+            }
+
             FileStream biomeStream = File.Create(biomePath);
             BinaryWriter biomeBinaryWriter = new BinaryWriter(biomeStream);
             biomeBinaryWriter.Write(biomeArray.Length);
@@ -63,19 +77,19 @@ namespace SaveData
             FileStream biomeStream = null;
             try
             {
-                biomeStream = File.OpenRead(SavingData.GetBiomeSavePath(world));
+                biomeStream = File.OpenRead(SavingData.GetGenSavePath(world.m_name));
             }
             catch 
             {
                 if(biomeStream == null)
                 {
-                    UnityEngine.Debug.Log("No biome data found.");
+                    UnityEngine.Debug.Log("No gen data found.");
                     WorldGenOptions.GenOptions.hasBiomeData = false;
                     WorldGenOptions.GenOptions.usingData = WorldGenOptions.GenOptions.defaultData;
                     return;
                 }
             }
-            UnityEngine.Debug.Log("Biome data found for " + world.m_name + ".");
+            UnityEngine.Debug.Log("Gen data found for " + world.m_name + ".");
             WorldGenOptions.GenOptions.hasBiomeData = true;
             WorldGenData data = new WorldGenData();
             try
@@ -87,7 +101,7 @@ namespace SaveData
             }
             catch
             {
-                ZLog.LogWarning("Incomplete biome data for " + world.m_name);
+                ZLog.LogWarning("Incomplete gen data for " + world.m_name);
             }
             finally
             {
@@ -108,7 +122,7 @@ namespace SaveData
         {
             try
             {
-                File.Delete(SavingData.GetBiomeSavePath(name));
+                File.Delete(SavingData.GetGenSavePath(name));
             }
             catch
             {
@@ -120,15 +134,16 @@ namespace SaveData
     //[HarmonyPatch(nameof(World.GetWorldList))]
     public static class ClearBrokenData_BiomePatch
     {
-        // FOR CLEARING BROKEN BIOME DATA. DO NOT IMPLEMENT IN RELEASE BUILDS
+        // FOR CLEARING BROKEN GEN DATA. DO NOT IMPLEMENT IN RELEASE BUILDS
         public static void Prefix()
         {
-            UnityEngine.Debug.Log("Clearing all biome data. If you see this message, please submit a bug report to the mod author.");
-            string[] array = Directory.GetFiles(World.GetWorldSavePath(), "*" + SavingData.saveFileSuffix);
+            UnityEngine.Debug.Log("Clearing all gen data. If you see this message, please submit a bug report to the mod author.");
+            string[] array = Directory.GetFiles(SavingData.GetGenSavePathRaw(), "*.fwl");
             foreach (string file in array)
             {
                 File.Delete(file);
             }
+            Directory.Delete(SavingData.GetGenSavePathRaw());
         }
     }
 
@@ -136,18 +151,32 @@ namespace SaveData
     [HarmonyPatch(nameof(World.GetWorldList))]
     public static class GetWorldList_BiomePatch
     {
+        // implement temporarily while users load worlds with outdated save data
         public static void Postfix(ref List<World> __result)
         {
             UnityEngine.Debug.Log("Getting world list.");
             List<World> worlds = new List<World>(__result);
-            foreach(World world in __result)
+
+            if (!File.Exists(SavingData.GetGenSavePathRaw()))
             {
-                if(world.m_name.Contains(SavingData.saveFileSuffix))
+                Directory.CreateDirectory(SavingData.GetGenSavePathRaw());
+            }
+
+            foreach (World world in __result)
+            {
+                if(world.m_name.Contains(SavingData.saveFileSuffixOld))
                 {
-                    UnityEngine.Debug.Log(world.m_name + " is biome data. Skipping.");
+                    UnityEngine.Debug.Log(world.m_name + " is biome data. Moving file to new location.");
+
+                    string orig = World.GetWorldSavePath() + "/" + world.m_name + ".fwl";
+                    string worldName = world.m_name.Replace(SavingData.saveFileSuffixOld, "");
+                    string newFile = SavingData.GetGenSavePathRaw() + worldName + SavingData.saveFileSuffix + ".fwl";
+                    File.Move(orig, newFile);
+
                     worlds.Remove(world);
                 }
             }
+
             __result = worlds;
         }
     }

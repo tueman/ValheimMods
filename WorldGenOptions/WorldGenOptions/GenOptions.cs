@@ -11,7 +11,7 @@ namespace WorldGenOptions
     public class GenOptions : BaseUnityPlugin
     {
         private const string GUID = "org.github.spacedrive.worldgen";
-        private const string VERSION = "0.1.3.0";
+        private const string VERSION = "0.1.4.0";
 
         // default, unmodded gen data
         public static WorldGenData defaultData = new WorldGenData();
