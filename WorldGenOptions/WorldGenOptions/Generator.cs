@@ -48,7 +48,7 @@ namespace Generator
                 {
                     if (baseHeight > WorldGenOptions.GenOptions.usingData.minMountainHeight)
                     {
-                        __result = WorldGenOptions.GenOptions.usingData.ashlandsSwitch;
+                        __result = WorldGenOptions.GenOptions.usingData.mountainSwitch;
                         return false;
                     }
                     __result = WorldGenOptions.GenOptions.usingData.deepNorthSwitch;
