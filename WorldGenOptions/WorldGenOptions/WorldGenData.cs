@@ -7,7 +7,7 @@
     // scale options are a bit odd but from testing increasing the values can 
     // make the biome look very scattered
 
-    public float minMountainHeight = 0.4f; // 0.4 DO NOT SET BELOW 0.2
+    public float minMountainHeight = 0.4f; // 0.4
 
     // for ashlands/deep north values high number = closer to spawn
     public float minAshlandsDist = -4000f; // -4000
