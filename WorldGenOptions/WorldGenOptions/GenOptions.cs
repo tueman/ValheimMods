@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using BepInEx;
 using BepInEx.Configuration;
+using BepInEx.Logging;
 using HarmonyLib;
 
 namespace WorldGenOptions
@@ -12,6 +13,8 @@ namespace WorldGenOptions
     {
         private const string GUID = "org.github.spacedrive.worldgen";
         private const string VERSION = "0.1.4.0";
+
+        public static ManualLogSource log;
 
         // default, unmodded gen data
         public static WorldGenData defaultData = new WorldGenData();
@@ -301,6 +304,7 @@ namespace WorldGenOptions
         void Awake()
         {
             Harmony harmony = new Harmony(GUID);
+            log = BepInEx.Logging.Logger.CreateLogSource("WorldGenOptions");
 
             InitializeConfig();
             AssignConfigData(ref savedData);

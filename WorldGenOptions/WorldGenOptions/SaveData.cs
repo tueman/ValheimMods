@@ -83,13 +83,13 @@ namespace SaveData
             {
                 if(biomeStream == null)
                 {
-                    UnityEngine.Debug.Log("No gen data found.");
+                    WorldGenOptions.GenOptions.log.LogWarning("No gen data found.");
                     WorldGenOptions.GenOptions.hasBiomeData = false;
                     WorldGenOptions.GenOptions.usingData = WorldGenOptions.GenOptions.defaultData;
                     return;
                 }
             }
-            UnityEngine.Debug.Log("Gen data found for " + world.m_name + ".");
+            WorldGenOptions.GenOptions.log.LogInfo("Gen data found for " + world.m_name + ".");
             WorldGenOptions.GenOptions.hasBiomeData = true;
             WorldGenData data = new WorldGenData();
             try
@@ -101,7 +101,7 @@ namespace SaveData
             }
             catch
             {
-                ZLog.LogWarning("Incomplete gen data for " + world.m_name);
+                WorldGenOptions.GenOptions.log.LogWarning("Incomplete gen data for " + world.m_name);
             }
             finally
             {
@@ -137,7 +137,7 @@ namespace SaveData
         // FOR CLEARING BROKEN GEN DATA. DO NOT IMPLEMENT IN RELEASE BUILDS
         public static void Prefix()
         {
-            UnityEngine.Debug.Log("Clearing all gen data. If you see this message, please submit a bug report to the mod author.");
+            WorldGenOptions.GenOptions.log.LogWarning("Clearing all gen data. If you see this message, please submit a bug report to the mod author.");
             string[] array = Directory.GetFiles(SavingData.GetGenSavePathRaw(), "*.fwl");
             foreach (string file in array)
             {
@@ -154,7 +154,7 @@ namespace SaveData
         // implement temporarily while users load worlds with outdated save data
         public static void Postfix(ref List<World> __result)
         {
-            UnityEngine.Debug.Log("Getting world list.");
+            WorldGenOptions.GenOptions.log.LogInfo("Getting world list.");
             List<World> worlds = new List<World>(__result);
 
             if (!File.Exists(SavingData.GetGenSavePathRaw()))
@@ -166,7 +166,7 @@ namespace SaveData
             {
                 if(world.m_name.Contains(SavingData.saveFileSuffixOld))
                 {
-                    UnityEngine.Debug.Log(world.m_name + " is biome data. Moving file to new location.");
+                    WorldGenOptions.GenOptions.log.LogWarning(world.m_name + " is biome data. Moving file to new location.");
 
                     string orig = World.GetWorldSavePath() + "/" + world.m_name + ".fwl";
                     string worldName = world.m_name.Replace(SavingData.saveFileSuffixOld, "");
