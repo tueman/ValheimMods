@@ -1,16 +1,7 @@
-﻿using System;
-using System.IO;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using BepInEx;
-using BepInEx.Configuration;
-using System.Reflection;
-using System.Reflection.Emit;
-using HarmonyLib;
+﻿using BepInEx;
 using UnityEngine;
 
-namespace WorldGenOptions
+namespace GenUI
 {
     public class GenOptionsUI : BaseUnityPlugin
     {
@@ -19,7 +10,7 @@ namespace WorldGenOptions
         private Rect windowRect, lastRect;
 
         public string worldName;
-        
+
         private void Awake()
         {
 
@@ -27,7 +18,7 @@ namespace WorldGenOptions
             windowRect.y = 170;
             windowRect.width = 500;
             windowRect.height = 720;
- 
+
         }
 
 
@@ -50,14 +41,14 @@ namespace WorldGenOptions
                 GUILayout.Label(worldName);
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("River Multiple Max Distance");
-                GUILayout.TextField(GenOptions.savedData.riverMultipleMaxDistance.ToString());
-                GenOptions.savedData.riverMultipleMaxDistance = GUILayout.HorizontalSlider(GenOptions.savedData.riverMultipleMaxDistance, 0f, 30000f);
+                GUILayout.TextField(WorldGenOptions.GenOptions.savedData.riverMultipleMaxDistance.ToString());
+                WorldGenOptions.GenOptions.savedData.riverMultipleMaxDistance = GUILayout.HorizontalSlider(WorldGenOptions.GenOptions.savedData.riverMultipleMaxDistance, 0f, 30000f);
                 GUILayout.EndHorizontal();
             }
         }
 
-        
-       
+
+
     }
 }
 
