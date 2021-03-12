@@ -63,7 +63,7 @@
     public float riverCurveWidth = 15f; // 15
     public float riverWavelength = 20f; // 20
 
-    public void WriteGenData(ref ZPackage package)
+    public void WriteBiomeData(ref ZPackage package)
     {
         //mountain
         package.Write(minMountainHeight);
@@ -123,7 +123,7 @@
         package.Write(riverWavelength);
     }
 
-    public void ReadGenData(ref ZPackage package)
+    public void ReadBiomeData(ref ZPackage package)
     {
         // mountain
         minMountainHeight = package.ReadSingle();
