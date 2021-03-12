@@ -1,17 +1,11 @@
 ﻿using System;
-using System.IO;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using BepInEx;
-using BepInEx.Configuration;
-using System.Reflection;
 using System.Reflection.Emit;
 using HarmonyLib;
 
 namespace Generator
 {
-
     [HarmonyPatch(typeof(WorldGenerator))]
     [HarmonyPatch(nameof(WorldGenerator.GetBiome))]
     [HarmonyPatch(new Type[] { typeof(float), typeof(float) })]
