@@ -41,7 +41,7 @@ namespace SaveData
             }
             ZPackage biomePackage = new ZPackage();
 
-            WorldGenOptions.GenOptions.savedData.WriteBiomeData(ref biomePackage);
+            WorldGenOptions.GenOptions.savedData.WriteGenData(ref biomePackage);
 
             string biomePath = SavingData.GetGenSavePath(__instance.m_name);
             byte[] biomeArray = biomePackage.GetArray();
@@ -73,6 +73,19 @@ namespace SaveData
             {
                 return;
             }
+            else if(!ZNet.instance.IsServer())
+            {
+                try
+                {
+                    ZRoutedRpc.instance.InvokeRoutedRPC(ZRoutedRpc.instance.GetServerPeerID(), "RequestGenData");
+                }
+                catch
+                {
+                    WorldGenOptions.GenOptions.log.LogError("Did not receive gen data, using default data instead.");
+                    WorldGenOptions.GenOptions.usingData = WorldGenOptions.GenOptions.defaultData;
+                }
+                return;
+            }
 
             FileStream biomeStream = null;
             try
@@ -97,7 +110,7 @@ namespace SaveData
                 BinaryReader reader = new BinaryReader(biomeStream);
                 int count = reader.ReadInt32();
                 ZPackage package = new ZPackage(reader.ReadBytes(count));
-                data.ReadBiomeData(ref package);
+                data.ReadGenData(ref package);
             }
             catch
             {
