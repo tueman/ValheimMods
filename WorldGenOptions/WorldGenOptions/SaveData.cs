@@ -69,21 +69,8 @@ namespace SaveData
     {
         public static void Prefix(World world)
         {
-            if(world.m_menu)
+            if(world.m_menu || !ZNet.instance.IsServer())
             {
-                return;
-            }
-            else if(!ZNet.instance.IsServer())
-            {
-                try
-                {
-                    ZRoutedRpc.instance.InvokeRoutedRPC(ZRoutedRpc.instance.GetServerPeerID(), "RequestGenData");
-                }
-                catch
-                {
-                    WorldGenOptions.GenOptions.log.LogError("Did not receive gen data, using default data instead.");
-                    WorldGenOptions.GenOptions.usingData = WorldGenOptions.GenOptions.defaultData;
-                }
                 return;
             }
 
@@ -97,13 +84,13 @@ namespace SaveData
                 if(biomeStream == null)
                 {
                     WorldGenOptions.GenOptions.log.LogWarning("No gen data found.");
-                    WorldGenOptions.GenOptions.hasBiomeData = false;
+                    WorldGenOptions.GenOptions.hasGenData = false;
                     WorldGenOptions.GenOptions.usingData = WorldGenOptions.GenOptions.defaultData;
                     return;
                 }
             }
             WorldGenOptions.GenOptions.log.LogInfo("Gen data found for " + world.m_name + ".");
-            WorldGenOptions.GenOptions.hasBiomeData = true;
+            WorldGenOptions.GenOptions.hasGenData = true;
             WorldGenData data = new WorldGenData();
             try
             {

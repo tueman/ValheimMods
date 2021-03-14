@@ -12,7 +12,7 @@ namespace WorldGenOptions
     public class GenOptions : BaseUnityPlugin
     {
         private const string GUID = "org.github.spacedrive.worldgen";
-        private const string VERSION = "0.1.4.0";
+        private const string VERSION = "0.1.5.0";
 
         public static ManualLogSource log;
 
@@ -25,7 +25,7 @@ namespace WorldGenOptions
         // data currently being used on active world
         public static WorldGenData usingData = new WorldGenData();
 
-        public static bool hasBiomeData = false;
+        public static bool hasGenData = false;
 
         // config entries
         ConfigFile configFile = new ConfigFile(Path.Combine(Paths.ConfigPath, "SpaceDrive-WorldGenOptions.cfg"), true);

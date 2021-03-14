@@ -5,17 +5,9 @@ namespace Server
 {
     public static class RPC
     {
-        public static void RPC_RequestGenData(long sender)
+        public static void RPC_SendGenData(ZRpc rpc, ZPackage pkg)
         {
-            WorldGenOptions.GenOptions.log.LogInfo("Received request for gen dat from " + sender);
-            ZPackage pkg = new ZPackage();
-            WorldGenOptions.GenOptions.savedData.WriteGenData(ref pkg);
-            ZRoutedRpc.instance.InvokeRoutedRPC(sender, "SendGenData", new object[] { pkg });
-        }
-
-        public static void RPC_SendGenData(long sender, ZPackage pkg)
-        {
-            WorldGenOptions.GenOptions.log.LogInfo("Received gen data from " + sender);
+            WorldGenOptions.GenOptions.log.LogInfo("Received gen data.");
             WorldGenData data = new WorldGenData();
             try
             {
@@ -27,26 +19,37 @@ namespace Server
             }
             finally
             {
+                WorldGenOptions.GenOptions.hasGenData = true;
                 WorldGenOptions.GenOptions.usingData = data;
             }
         }
     }
 
-    [HarmonyPatch(typeof(WorldGenerator))]
-    [HarmonyPatch(MethodType.Constructor)]
-    [HarmonyPatch(new Type[] { typeof(World) })]
+    [HarmonyPatch(typeof(ZNet))]
+    [HarmonyPatch(nameof(ZNet.SendPeerInfo))]
+    public static class SendRequest_Patch
+    {
+        public static void Prefix(ZNet __instance, ZRpc rpc)
+        {
+            if(__instance.IsServer())
+            {
+                ZPackage pkg = new ZPackage();
+                WorldGenOptions.GenOptions.savedData.WriteGenData(ref pkg);
+                WorldGenOptions.GenOptions.log.LogInfo("Calling RPC request.");
+                rpc.Invoke("SendGenData", pkg);
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(ZNet))]
+    [HarmonyPatch(nameof(ZNet.OnNewConnection))]
     public static class RegisterRPC_GenData
     {
-        public static void Prefix(ref World world)
+        public static void Prefix(ZNetPeer peer)
         {
-            if(world.m_menu)
-            {
-                return;
-            }
             try
             {
-                ZRoutedRpc.instance.Register("RequestGenData", new Action<long>(RPC.RPC_RequestGenData));
-                ZRoutedRpc.instance.Register("SendGenData", new Action<long, ZPackage>(RPC.RPC_SendGenData));
+                peer.m_rpc.Register<ZPackage>("SendGenData", new Action<ZRpc, ZPackage>(RPC.RPC_SendGenData));
             }
             catch (Exception e)
             {
