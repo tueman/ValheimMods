@@ -34,7 +34,7 @@ namespace Server
             if(__instance.IsServer())
             {
                 ZPackage pkg = new ZPackage();
-                WorldGenOptions.GenOptions.savedData.WriteGenData(ref pkg);
+                WorldGenOptions.GenOptions.usingData.WriteGenData(ref pkg);
                 WorldGenOptions.GenOptions.log.LogInfo("Calling RPC request.");
                 rpc.Invoke("SendGenData", pkg);
             }
